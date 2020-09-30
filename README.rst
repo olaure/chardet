@@ -28,13 +28,17 @@ The simplest way to use chardet is simply the package-level exported Detect meth
 package main
 
 import (
-  "fmt"
-  "github.com/olaure/chardet"
+	"fmt"
+	"github.com/olaure/chardet"
 )
 
 func main() {
-  data := []byte("नमस्कार")
-  fmt.Printf("Detectected character set : %v", chardet.Detect(data))
+	data := []byte("नमस्कार")
+	detected := chardet.Detect(data)
+	fmt.Printf(
+		"Detectected character set : %v with confidence %v\n",
+		detected.Encoding, detected.Confidence,
+	)
 }
 ```
 
@@ -53,3 +57,4 @@ About
 
 This is a port to go of the excellent python `chardet library<https://github.com/chardet/chardet>`.
 It is based on the mozilla statistical encoding detector.
+v0.0.1 is based on the latest commit of chardet master : eb1a10a5d1b63bd9aefd1df9c669c298277e420b

@@ -28,13 +28,17 @@ The simplest way to use chardet is simply the package-level exported Detect meth
 package main
 
 import (
-  "fmt"
-  "github.com/olaure/chardet"
+	"fmt"
+	"github.com/olaure/chardet"
 )
 
 func main() {
-  data := []byte("नमस्कार")
-  fmt.Printf("Detectected character set : %v", chardet.Detect(data))
+	data := []byte("नमस्कार")
+	detected := chardet.Detect(data)
+	fmt.Printf(
+		"Detectected character set : %v with confidence %v\n",
+		detected.Encoding, detected.Confidence,
+	)
 }
 ```
 

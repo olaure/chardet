@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.com/olaure/chardet.svg?branch=master
+    :target: https://travis-ci.com/olaure/chardet
+
 Chardet: The Universal Character Encoding Detector
 --------------------------------------------------
 

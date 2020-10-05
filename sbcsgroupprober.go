@@ -41,8 +41,6 @@ type SBCSGroupProber struct {
 
 func newSBCSGroupProber() *SBCSGroupProber {
 	hebrewProber := newHebrewProber()
-	// TODO POTENTIAL BUG all those models are not instanciated, they are global variables
-	// This may cause a bug when the same model is reused or when models share variables
 	logicalHebrewProber := newSingleByteCharSetProber(&WINDOWS1255HebrewModel, false, hebrewProber)
 	// TODO : See if ISO-8859-8 Hebrew model works better here
 	//        since it's actually the visual one
@@ -69,8 +67,8 @@ func newSBCSGroupProber() *SBCSGroupProber {
 		newSingleByteCharSetProber(&ISO8859_5BulgarianModel, false, nil),
 		// TODO : Restore Hungarian encodings (iso-8859-2 and windows-1250)
 		//        After the model is retrained
-		// newSingleByteCharSetProber(ISO8859_2HungarianModel, false, nil),
-		// newSingleByteCharSetProber(WINDOWS1250HungarianModel, false, nil),
+		// newSingleByteCharSetProber(&ISO8859_2HungarianModel, false, nil),
+		// newSingleByteCharSetProber(&WINDOWS1250HungarianModel, false, nil),
 		newSingleByteCharSetProber(&TIS620ThaiModel, false, nil),
 		newSingleByteCharSetProber(&ISO8859_9TurkishModel, false, nil),
 		hebrewProber,

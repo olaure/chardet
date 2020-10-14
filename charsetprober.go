@@ -51,8 +51,16 @@ var CPShortcutThreshold = 0.95
 var reHighByteFilter = regexp.MustCompile(`([[:ascii:]])+`)
 
 // [^[:ascii:]] == [\x80-\xFF]
+/*
+captures "words" around every non-ascii parts
+	<= Takes every alpha char preceding
+	=> Takes every alpha char following
+	=> Takes an extra character if it is ASCII AND non alpha
+If last character is ascii and non alpha
+	change it for a space.
+*/
 var reInternationalFilter = regexp.MustCompile(
-	`[[:alpha:]]*[^[:ascii:]]+[[:alpha:]]*[[:cntrl:] 0-9!"#$%&'()*+,\-./:;<=>?@[\\\]^_\x60{|}~]?`)
+	`[[:alpha:]]*[^[:ascii:]]+[[:alpha:]]*([^[:alpha:][:^ascii:]])?`)
 
 // var reIsAlpha = regexp.MustCompile(`[a-zA-Z]+`)
 
@@ -104,13 +112,17 @@ func filterHighByteOnly(buf []byte) []byte {
 	This filter applies to all scripts which do not use english characters.
 */
 func filterInternationalWords(buf []byte) []byte {
-	filtered := []byte{}
 	// This regexp filters out only words that have at least one
-	// International character. The word may include ont marker
+	// International character. The word may include one marker
 	// character at the end.
 	words := reInternationalFilter.FindAll(buf, -1)
+	totalLength := 0
+	for _, w := range words {
+		totalLength += len(w)
+	}
+	filtered := make([]byte, 0, totalLength)
 	for _, word := range words {
-		filtered = append(filtered, word[:len(word)-1]...)
+		filtered = append(filtered, word...)
 
 		// If the last character in the word is a marker, replace it with a
 		// space as markers shouldn't affect our analysis (they are used
@@ -118,9 +130,10 @@ func filterInternationalWords(buf []byte) []byte {
 		lastChar := word[len(word)-1]
 		//if !reIsAlpha.Match([]byte{lastChar}) && lastChar < 0x80 {
 		if lastChar < 0x80 && !(('a' <= lastChar && lastChar <= 'z') || ('A' <= lastChar && lastChar <= 'Z')) {
-			lastChar = ' '
+			filtered[len(filtered)-1] = ' '
+			//lastChar = ' '
 		}
-		filtered = append(filtered, lastChar)
+		//filtered = append(filtered, lastChar)
 	}
 	return filtered
 }

@@ -51,6 +51,7 @@ type SingleByteCharSetModel struct {
 	charsetName          string
 	language             string
 	charToOrderMap       map[byte]CharacterCategory
+	charToOrderList      [256]CharacterCategory
 	languageModel        map[CharacterCategory]map[CharacterCategory]int
 	typicalPositiveRatio float64
 	keepASCIILetters     bool
@@ -134,20 +135,27 @@ func (s *SingleByteCharSetProber) feed(data []byte) ProbingState {
 	if len(newData) == 0 {
 		return s.state
 	}
-	charToOrderMap := s.model.charToOrderMap
+	//charToOrderMap := s.model.charToOrderMap
+	charToOrderList := s.model.charToOrderList
 	languageModel := s.model.languageModel
 	for _, chr := range newData {
-		order, ok := charToOrderMap[chr]
-		/*
-		 * XXX: This was SYMBOL_CAT_ORDER before, with a value of 250, but
-		 *      CharacterCategory.SYMBOL is actually 253, so we use CONTROL
-		 *      to make it closer to the original intent. The only difference
-		 *      is whether or not we count digits and control characters for
-		 *      _total_char purposes.
-		 */
-		if !ok {
+		var order CharacterCategory
+		if chr > 255 {
 			order = CCUndefined
+		} else {
+			order = charToOrderList[chr]
 		}
+		// order, ok := charToOrderMap[chr]
+		// /*
+		//  * XXX: This was SYMBOL_CAT_ORDER before, with a value of 250, but
+		//  *      CharacterCategory.SYMBOL is actually 253, so we use CONTROL
+		//  *      to make it closer to the original intent. The only difference
+		//  *      is whether or not we count digits and control characters for
+		//  *      _total_char purposes.
+		//  */
+		// if !ok {
+		// 	order = CCUndefined
+		// }
 		if order < CCControl {
 			s.totalChar++
 		}

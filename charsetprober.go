@@ -53,7 +53,8 @@ var reHighByteFilter = regexp.MustCompile(`([[:ascii:]])+`)
 // [^[:ascii:]] == [\x80-\xFF]
 var reInternationalFilter = regexp.MustCompile(
 	`[[:alpha:]]*[^[:ascii:]]+[[:alpha:]]*[[:cntrl:] 0-9!"#$%&'()*+,\-./:;<=>?@[\\\]^_\x60{|}~]?`)
-var reIsAlpha = regexp.MustCompile(`[a-zA-Z]+`)
+
+// var reIsAlpha = regexp.MustCompile(`[a-zA-Z]+`)
 
 // CharSetProber probes a charset???
 type CharSetProber struct {
@@ -109,13 +110,14 @@ func filterInternationalWords(buf []byte) []byte {
 	// character at the end.
 	words := reInternationalFilter.FindAll(buf, -1)
 	for _, word := range words {
-		filtered = append(filtered, word...)
+		filtered = append(filtered, word[:len(word)-1]...)
 
 		// If the last character in the word is a marker, replace it with a
 		// space as markers shouldn't affect our analysis (they are used
 		// similarly across all languages and may thus have similar frequencies).
 		lastChar := word[len(word)-1]
-		if !reIsAlpha.Match([]byte{lastChar}) && lastChar < 0x80 {
+		//if !reIsAlpha.Match([]byte{lastChar}) && lastChar < 0x80 {
+		if lastChar < 0x80 && !(('a' <= lastChar && lastChar <= 'z') || ('A' <= lastChar && lastChar <= 'Z')) {
 			lastChar = ' '
 		}
 		filtered = append(filtered, lastChar)
@@ -143,7 +145,8 @@ func filterWithEnglishLetters(buf []byte) []byte {
 		}
 
 		// If current character is not extended-ASCII and not alphabetic...
-		if chr < 0x80 && !reIsAlpha.Match([]byte{chr}) {
+		//if chr < 0x80 && !reIsAlpha.Match([]byte{chr}) {
+		if chr < 0x80 && !(('a' <= chr && chr <= 'z') || ('A' <= chr && chr <= 'Z')) {
 			// ... and we aren't in a tag
 			if cur > prev && !inTag {
 				// Keep everything after last non-extended-ASCII,

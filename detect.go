@@ -30,8 +30,17 @@ package chardet
 */
 
 import (
+	"bytes"
+	log "github.com/sirupsen/logrus"
+	"golang.org/x/net/html/charset"
+	"io/ioutil"
+	"regexp"
 	"strings"
 )
+
+// NEW
+//var originalUTF8Re = regexp.MustCompile(`[^\pL\pN\pP\pZ]`)
+var originalUTF8Re = regexp.MustCompile(`[\pC\pS\pP]`)
 
 // Detect detects the encoding of a byte slice
 func Detect(data []byte) *Result {
@@ -70,4 +79,73 @@ func DetectAll(data []byte) []*Result {
 		}
 	}
 	return []*Result{detector.Result}
+}
+
+// DetectShortestUTF8 detects the best encoding for a byte slice
+// Given that the right encoding may not have the highest confidence.
+// Heuristic is made with the fewer count of exotic UTF8 chars
+// (neither letters, numbers, punctuation or spaces)
+func DetectShortestUTF8(data []byte) *Result {
+	detector := newUniversalDetector(LFAll)
+	detector.Feed(data)
+	highConfidenceResult := detector.Close()
+	lowestConfidence := 2.0*highConfidenceResult.Confidence - 1.0 // conf - (1 - conf)
+	if highConfidenceResult.Confidence >= 0.99 {
+		return highConfidenceResult
+	}
+
+	currentBestResult := highConfidenceResult
+	currentBestScore := scoreFromResult(data, currentBestResult)
+
+	if detector.inputState == UDSHighByte {
+		for _, prober := range detector.charsetProbers {
+			conf := prober.getConfidence()
+			if conf <= lowestConfidence || prober.getConfidence() <= UDMinimumThreshold {
+				break
+			}
+			charsetName := prober.charsetName()
+			lowerCharsetName := strings.ToLower(charsetName)
+			// Use windows encoding name instead of ISO-8859
+			// if we saw any extra windows-specific bytes
+			if strings.HasPrefix(lowerCharsetName, "iso-8859") && detector.hasWinBytes {
+				charsetNameTmp, ok := UDIsoWinMap[lowerCharsetName]
+				if ok {
+					charsetName = charsetNameTmp
+				}
+			}
+			newResult := &Result{
+				Encoding:   charsetName,
+				Confidence: prober.getConfidence(),
+			}
+			newScore := scoreFromResult(data, newResult)
+			if newScore < currentBestScore {
+				currentBestScore = newScore
+				currentBestResult = newResult
+			}
+		}
+	}
+	if highConfidenceResult.Encoding != currentBestResult.Encoding {
+		log.Debugf("Detected differing encoding from highest confidence : %v vs %v", highConfidenceResult, currentBestResult)
+	}
+	return currentBestResult
+}
+
+func intoCharset(b []byte, encoding string) ([]byte, error) {
+	reader, err := charset.NewReaderLabel(encoding, bytes.NewReader(b))
+	if err != nil {
+		return nil, err
+	}
+	decoded, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+	return decoded, nil
+}
+
+func scoreFromResult(data []byte, result *Result) int {
+	bestDecode, err := intoCharset(data, result.Encoding)
+	if err != nil {
+		return len(data)
+	}
+	return len(originalUTF8Re.FindAll(bestDecode, -1))
 }

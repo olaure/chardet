@@ -45,6 +45,28 @@ func main() {
 }
 ```
 
+Another way uses the method DetectShortestUTF8 that will look for the decoded string with the lowest count of unicode categories C (control), S (symbol), P (punctuation):
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/olaure/chardet"
+)
+
+func main() {
+	data := []byte("नमस्कार")
+	detected := chardet.DetectShortestUTF8(data)
+	fmt.Printf(
+		"Detectected character set : %v with confidence %v\n",
+		detected.Encoding, detected.Confidence,
+	)
+}
+```
+
+This function thus will not necessarily yield the highest probability decoder, unless the probability is maximum.
+
 Documentation
 -------------
 

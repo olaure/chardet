@@ -286,15 +286,35 @@ func (u *UniversalDetector) Close() *Result {
 	// Log all probers confidences if none met the UDMinimumThreshold
 	if u.Result == nil {
 		// Log No prober met minimum threshold
-		for _, prober := range u.charsetProbers {
-			if prober == nil {
-				continue
-			}
-			// Distinguish between GroupProber and the rest before logging
-			// THIS IS A CURRENT TODO
-		}
+		u.printProbersDetails()
 	}
 	return u.Result
+}
+
+func (u *UniversalDetector) printProbersDetails() {
+	for _, prober := range u.charsetProbers {
+		if prober == nil {
+			continue
+		}
+		// Distinguish between GroupProber and the rest before logging
+		if mbcsprober, ok := prober.(*CharSetGroupProber); ok {
+			for _, subprober := range mbcsprober.probers {
+				log.Debugf(
+					"Prober %v (lang %v) - %v",
+					subprober.charsetName(),
+					subprober.language(),
+					subprober.getConfidence(),
+				)
+			}
+		} else {
+			log.Debugf(
+				"Prober %v (lang %v) - %v",
+				prober.charsetName(),
+				prober.language(),
+				prober.getConfidence(),
+			)
+		}
+	}
 }
 
 func scanBOMs(data []byte) *Result {

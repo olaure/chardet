@@ -31,11 +31,18 @@ package chardet
 */
 
 import (
-	"math"
+//"math"
 )
 
 // UTF8OneCharProb probability of one character points
 var UTF8OneCharProb = 0.5
+
+// UTF8LowCountCharUnlikelyProb unlikely probability from previous UTF8OneCharProb * 0.99
+// Computed with math.Pow(UTF8OneCharProb, u.numMBChars) * 0.99
+var UTF8LowCountCharUnlikelyProb = []float64{
+	0.99, 0.5 * 0.99, 0.25 * 0.99,
+	0.125 * 0.99, 0.0625 * 0.99, 0.03125 * 0.99, 0.015625 * 0.99,
+}
 
 // UTF8Prober prober
 type UTF8Prober struct {
@@ -72,8 +79,9 @@ func (u *UTF8Prober) language() string {
 func (u *UTF8Prober) getConfidence() float64 {
 	unlike := 0.99
 	if u.numMBChars < 6 {
-		unlike *= math.Pow(UTF8OneCharProb, float64(u.numMBChars))
-		return 1.0 - unlike
+		return 1.0 - UTF8LowCountCharUnlikelyProb[u.numMBChars]
+		//unlike *= math.Pow(UTF8OneCharProb, float64(u.numMBChars))
+		//return 1.0 - unlike
 	}
 	return unlike
 }

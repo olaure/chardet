@@ -65,6 +65,7 @@ func newSBCSGroupProber() *SBCSGroupProber {
 		newSingleByteCharSetProber(&ISO8859_7GreekModel, false, nil),
 		newSingleByteCharSetProber(&WINDOWS1253GreekModel, false, nil),
 		newSingleByteCharSetProber(&ISO8859_5BulgarianModel, false, nil),
+		newSingleByteCharSetProber(&WINDOWS1251BulgarianModel, false, nil),
 		// TODO : Restore Hungarian encodings (iso-8859-2 and windows-1250)
 		//        After the model is retrained
 		// newSingleByteCharSetProber(&ISO8859_2HungarianModel, false, nil),

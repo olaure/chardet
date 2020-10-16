@@ -56,21 +56,33 @@ func newSBCSGroupProber() *SBCSGroupProber {
 	 *      (i.e. ISO8859_7 and WINDOWS1253) exchange order and they may have the same score.
 	 */
 	probers := []Prober{
+		// RussianLangModel map[CharacterCategory][64]int
 		newSingleByteCharSetProber(&WINDOWS1251RussianModel, false, nil),
+		// RussianLangModel map[CharacterCategory][64]int
 		newSingleByteCharSetProber(&KOI8RRussianModel, false, nil),
+		// RussianLangModel map[CharacterCategory][64]int
 		newSingleByteCharSetProber(&ISO8859_5RussianModel, false, nil),
+		// RussianLangModel map[CharacterCategory][64]int
 		newSingleByteCharSetProber(&MACCYRILLICRussianModel, false, nil),
+		// RussianLangModel map[CharacterCategory][64]int
 		newSingleByteCharSetProber(&IBM866RussianModel, false, nil),
+		// RussianLangModel map[CharacterCategory][64]int
 		newSingleByteCharSetProber(&IBM855RussianModel, false, nil),
+		// GreekLangModel map[CharacterCategory][62]int
 		newSingleByteCharSetProber(&ISO8859_7GreekModel, false, nil),
+		// GreekLangModel map[CharacterCategory][62]int
 		newSingleByteCharSetProber(&WINDOWS1253GreekModel, false, nil),
+		// BulgarianLangModel map[CharacterCategory][64]int
 		newSingleByteCharSetProber(&ISO8859_5BulgarianModel, false, nil),
+		// BulgarianLangModel map[CharacterCategory][64]int
 		newSingleByteCharSetProber(&WINDOWS1251BulgarianModel, false, nil),
 		// TODO : Restore Hungarian encodings (iso-8859-2 and windows-1250)
 		//        After the model is retrained
 		// newSingleByteCharSetProber(&ISO8859_2HungarianModel, false, nil),
 		// newSingleByteCharSetProber(&WINDOWS1250HungarianModel, false, nil),
+		// ThaiLangModel map[CharacterCategory][64]int
 		newSingleByteCharSetProber(&TIS620ThaiModel, false, nil),
+		// TurkishLangModel map[CharacterCategory][64]int
 		newSingleByteCharSetProber(&ISO8859_9TurkishModel, false, nil),
 		hebrewProber,
 		logicalHebrewProber,

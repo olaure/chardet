@@ -96,7 +96,16 @@ func (c *CharSetProber) getState() ProbingState {
 }
 
 func filterHighByteOnly(buf []byte) []byte {
-	return reHighByteFilter.ReplaceAll(buf, []byte{' '})
+	filtered := make([]byte, len(buf))
+	for idx, b := range buf {
+		if b>>7 == 0 { // Low byte, < 0x80
+			filtered[idx] = ' '
+		} else {
+			filtered[idx] = b
+		}
+	}
+	return filtered
+	//return reHighByteFilter.ReplaceAll(buf, []byte{' '})
 }
 
 /*  We define three types of bytes:

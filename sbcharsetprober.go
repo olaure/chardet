@@ -52,7 +52,7 @@ type SingleByteCharSetModel struct {
 	language             string
 	charToOrderMap       map[byte]CharacterCategory
 	charToOrderList      [256]CharacterCategory
-	languageModel        map[CharacterCategory]map[CharacterCategory]int
+	languageModel        map[CharacterCategory][]int
 	typicalPositiveRatio float64
 	keepASCIILetters     bool
 	alphabet             string

@@ -111,7 +111,7 @@ func filterHighByteOnly(buf []byte) []byte {
 
 	This filter applies to all scripts which do not use english characters.
 */
-func filterInternationalWords(buf []byte) []byte {
+func prevFilterInternationalWords(buf []byte) []byte {
 	// This regexp filters out only words that have at least one
 	// International character. The word may include one marker
 	// character at the end.
@@ -136,6 +136,57 @@ func filterInternationalWords(buf []byte) []byte {
 		//filtered = append(filtered, lastChar)
 	}
 	return filtered
+}
+
+/*  We define three types of bytes:
+    - alphabet: english alphabets [a-zA-Z]
+    - international: international characters [\x80-\xFF]
+    - marker: everything else [^a-zA-Z\x80-\xFF]
+
+	The input buffer can be thought to contain a series of words delimited
+	by markers. This function works to filter all words that contain at
+	least one internaitonal character. All contiguous sequences of markers
+	are replaced by a single space ASCII character.
+
+	This filter applies to all scripts which do not use english characters.
+*/
+func filterInternationalWords(buf []byte) []byte {
+	filtered := make([]byte, 0, len(buf))
+	isAlpha := func(b byte) bool {
+		return ('a' <= b && b <= 'z') || ('A' <= b && b <= 'Z')
+	}
+	start := 0
+	hasHighByte := false
+	inWord := false
+	for idx, b := range buf {
+		if !inWord {
+			if isAlpha(b) || (b >= 0x80) { // Start of word
+				inWord = true
+				hasHighByte = (b >= 0x80)
+				start = idx
+			} else {
+				continue
+			}
+		} else {
+			if isAlpha(b) || b >= 0x80 { // In word
+				hasHighByte = hasHighByte || (b >= 0x80)
+			} else { // End of word
+				inWord = false
+				if hasHighByte { // End of interesting word
+					filtered = append(filtered, buf[start:idx+1]...)
+					// Is replacing the last marker character with a space useful?
+					// It is the previous behavior though.
+					filtered[len(filtered)-1] = ' '
+				}
+				// A word without any high bytes => Not interesting
+			}
+		}
+	}
+	if inWord && hasHighByte { // Last part of buffer is still interesting
+		filtered = append(filtered, buf[start:]...)
+	}
+	// Let's release the unused memory
+	return filtered[:len(filtered)]
 }
 
 /*  Returns a copy of buf that retains only the sequences of english alphabet

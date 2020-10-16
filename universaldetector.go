@@ -139,7 +139,7 @@ func (u *UniversalDetector) Feed(data []byte) {
 		return
 	}
 
-	// First check for known BOMs (byte order marks) since these are guaranteeed to be correct
+	// First check for known BOMs (byte order marks) since these are guaranteed to be correct
 	if !u.gotData {
 		bomResult := scanBOMs(data)
 		u.gotData = true

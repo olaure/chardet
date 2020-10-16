@@ -152,23 +152,26 @@ func (u *UniversalDetector) Feed(data []byte) {
 
 	// If none of those matched and we've only seen ASCII so far,
 	// check for high bytes and escape sequences.
+	highByteMark, escByteMark, winBytesMark := detectMarks(data, u.lastChar)
 	if u.inputState == UDSPureASCII {
-		if UDHighByteDetector.Match(data) {
+		//if UDHighByteDetector.Match(data) {
+		if highByteMark {
 			u.inputState = UDSHighByte
 		} else if u.inputState == UDSPureASCII {
-			if UDEscDetector.Match(data) {
+			//if UDEscDetector.Match(data) {
+			if escByteMark {
 				u.inputState = UDSEscASCII
-			} else if u.lastChar != nil {
-				// This isn't pretty but we don't want to copy the full data, only the start
-				maxLen := 5
-				if len(data) < maxLen {
-					maxLen = len(data)
-				}
-				//dataStart := append([]byte{*u.lastChar}, data[:maxLen]...)
-				dataStart := append([]byte{*u.lastChar}, data...)
-				if UDEscDetector.Match(dataStart) {
-					u.inputState = UDSEscASCII
-				}
+				//} else if u.lastChar != nil {
+				//	// This isn't pretty but we don't want to copy the full data, only the start
+				//	maxLen := 5
+				//	if len(data) < maxLen {
+				//		maxLen = len(data)
+				//	}
+				//	//dataStart := append([]byte{*u.lastChar}, data[:maxLen]...)
+				//	dataStart := append([]byte{*u.lastChar}, data...)
+				//	if UDEscDetector.Match(dataStart) {
+				//		u.inputState = UDSEscASCII
+				//	}
 			}
 		}
 	}
@@ -216,8 +219,29 @@ func (u *UniversalDetector) Feed(data []byte) {
 				break
 			}
 		}
-		u.hasWinBytes = detectWinBytes(data)
+		//u.hasWinBytes = detectWinBytes(data)
+		u.hasWinBytes = winBytesMark
 	}
+}
+
+func detectMarks(data []byte, lastChar *byte) (bool, bool, bool) {
+	highByte := false
+	escByte := false
+	winBytes := false
+	esc0 := false
+	if lastChar != nil {
+		esc0 = (*lastChar == '~')
+	}
+	for _, x := range data {
+		highByte = highByte || (x >= 0x80)
+		winBytes = winBytes || (x >= 0x80 && x <= 0x9f)
+		escByte = escByte || (x == '\033') || (esc0 && x == '{')
+		esc0 = (x == '~')
+		if winBytes && escByte {
+			return true, true, true
+		}
+	}
+	return highByte, escByte, winBytes
 }
 
 func detectWinBytes(data []byte) bool {

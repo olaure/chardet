@@ -95,7 +95,7 @@ func DetectShortestUTF8(data []byte) *Result {
 	}
 
 	currentBestResult := highConfidenceResult
-	currentBestScore := scoreFromResult(data, currentBestResult)
+	currentBestScore := scoreFromResult(data, currentBestResult, -1)
 
 	if detector.inputState == UDSHighByte {
 		for _, prober := range detector.charsetProbers {
@@ -117,7 +117,7 @@ func DetectShortestUTF8(data []byte) *Result {
 				Encoding:   charsetName,
 				Confidence: prober.getConfidence(),
 			}
-			newScore := scoreFromResult(data, newResult)
+			newScore := scoreFromResult(data, newResult, currentBestScore)
 			if newScore < currentBestScore {
 				currentBestScore = newScore
 				currentBestResult = newResult
@@ -142,10 +142,10 @@ func intoCharset(b []byte, encoding string) ([]byte, error) {
 	return decoded, nil
 }
 
-func scoreFromResult(data []byte, result *Result) int {
+func scoreFromResult(data []byte, result *Result, currentBestScore int) int {
 	bestDecode, err := intoCharset(data, result.Encoding)
 	if err != nil {
 		return len(data)
 	}
-	return len(originalUTF8Re.FindAll(bestDecode, -1))
+	return len(originalUTF8Re.FindAll(bestDecode, currentBestScore))
 }

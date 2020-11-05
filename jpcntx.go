@@ -222,7 +222,7 @@ func jcaGetOrderSJIS(data []byte, s *string) (int, int) {
 	if (0x81 <= firstChar && firstChar <= 0x9f) || (0xe0 <= firstChar && firstChar <= 0xfc) {
 		charLen = 2
 		if firstChar == 0x87 || (0xfa <= firstChar && firstChar <= 0xfc) {
-			*s = "CP932"
+			*s = "MS932"
 		}
 	} else {
 		charLen = 1

@@ -34,13 +34,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/html/charset"
 	"io/ioutil"
-	"regexp"
 	"strings"
+	"unicode/utf8"
 )
-
-// NEW
-//var originalUTF8Re = regexp.MustCompile(`[^\pL\pN\pP\pZ]`)
-var originalUTF8Re = regexp.MustCompile(`[\pC\pS\pP]`)
 
 // Detect detects the encoding of a byte slice
 func Detect(data []byte) *Result {
@@ -145,7 +141,7 @@ func intoCharset(b []byte, encoding string) ([]byte, error) {
 func scoreFromResult(data []byte, result *Result, currentBestScore int) int {
 	bestDecode, err := intoCharset(data, result.Encoding)
 	if err != nil {
-		return len(data)
+		return utf8.RuneCountInString(string(data))
 	}
-	return len(originalUTF8Re.FindAll(bestDecode, currentBestScore))
+	return utf8.RuneCountInString(string(bestDecode))
 }

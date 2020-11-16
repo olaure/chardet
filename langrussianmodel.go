@@ -10951,7 +10951,7 @@ var MACCYRILLICRussianCharToOrderList = [256]CharacterCategory{
 
 // MACCYRILLICRussianModel MACCYRILLIC_RUSSIAN_MODEL
 var MACCYRILLICRussianModel = SingleByteCharSetModel{
-	charsetName:          "MacCyrillic",
+	charsetName:          "x-mac-cyrillic",
 	language:             "Russian",
 	charToOrderMap:       MACCYRILLICRussianCharToOrder,
 	charToOrderList:      MACCYRILLICRussianCharToOrderList,

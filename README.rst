@@ -10,7 +10,7 @@ Detects
  - Big5, GB2312, EUC-TW, HZ-GB-2312, ISO-2022-CN (Traditional and Simplified Chinese)
  - EUC-JP, SHIFT_JIS, CP932 (aka MS932), ISO-2022-JP (Japanese)
  - EUC-KR, ISO-2022-KR (Korean)
- - KOI8-R, MacCyrillic, IBM855, IBM866, ISO-8859-5, windows-1251 (Cyrillic)
+ - KOI8-R, x-mac-cyrillic (prev MacCyrillic), IBM855, IBM866, ISO-8859-5, windows-1251 (Cyrillic)
  - ISO-8859-5, windows-1251 (Bulgarian)
  - ISO-8859-1, windows-1252 (Western European languages)
  - ISO-8859-7, windows-1253 (Greek)

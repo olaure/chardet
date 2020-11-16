@@ -97,7 +97,7 @@ func getTests() []testCase {
 	for _, encoding := range encodings {
 		enc := path.Base(encoding)
 		for _, postfix := range []string{"-arabic", "-bulgarian", "-cyrillic", "-greek", "-hebrew", "-hungarian", "-turkish"} {
-			if strings.HasSuffix(enc, postfix) {
+			if strings.HasSuffix(enc, postfix) && enc != "x-mac-cyrillic" {
 				enc = strings.TrimSuffix(enc, postfix)
 				break
 			}

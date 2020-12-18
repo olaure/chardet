@@ -123,6 +123,7 @@ func (c *CharSetGroupProber) feed(data []byte) ProbingState {
 			continue
 		case PSFound:
 			c.bestGuessProber = prober
+			c.state = PSFound
 			return c.state
 		case PSNotMe:
 			prober.setActive(false)

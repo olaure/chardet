@@ -21,9 +21,15 @@ Detects
    Our ISO-8859-2 and windows-1250 (Hungarian) probers have been temporarily
    disabled until we can retrain the models.
 
+About
+-----
+
+This is a port to go of the excellent python `chardet library<https://github.com/chardet/chardet>`.
+It is based on the mozilla statistical encoding detector.
+v0.0.7 is based on the chardet version [0.0.4 (Dec 20)](https://github.com/chardet/chardet/releases/tag/4.0.0)
 
 Usage
-------------
+-----
 
 The simplest way to use chardet is simply the package-level exported Detect method:
 
@@ -66,20 +72,3 @@ func main() {
 ```
 
 This function thus will not necessarily yield the highest probability decoder, unless the probability is maximum.
-
-Documentation
--------------
-
-Coming soon...
-
-Command-line Tool
------------------
-
-Coming soon...
-
-About
------
-
-This is a port to go of the excellent python `chardet library<https://github.com/chardet/chardet>`.
-It is based on the mozilla statistical encoding detector.
-v0.0.1 is based on the latest commit of chardet master : eb1a10a5d1b63bd9aefd1df9c669c298277e420b
